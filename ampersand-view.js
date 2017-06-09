@@ -243,16 +243,16 @@ assign(View.prototype, {
             }
         }
     },
+
+    _onStateChange: function(eventName) {
+        if (eventName.slice(0, 7) === 'change:') {
+            this._applyBindingsForKey(eventName.split(':')[1]);
         }
     },
 
     _initializeBindings: function () {
         if (!this.bindings) return;
-        this.on('all', function (eventName) {
-            if (eventName.slice(0, 7) === 'change:') {
-                this._applyBindingsForKey(eventName.split(':')[1]);
-            }
-        }, this);
+        this.on('all', this._onStateChange);
     },
 
     // ## _initializeSubviews
@@ -423,7 +423,8 @@ assign(View.prototype, {
         var parsedBindings = this._parsedBindings;
         if (!this.bindingsSet) return;
         if (this._subviews) invokeMap(flatten(this._subviews), 'remove');
-        this.stopListening();
+        this.stopListening();    
+        this.off('all', this._onStateChange);
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
         // amount of generated functions to avoid memory leaks.
