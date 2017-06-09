@@ -232,11 +232,17 @@ assign(View.prototype, {
     _applyBindingsForKey: function (name) {
         if (!this.el) return;
         var fns = this._parsedBindings.getGrouped(name);
-        var item;
+        var item, val, fn, lastPart, path;
+        var el = this.el;
         for (item in fns) {
-            fns[item].forEach(function (fn) {
-                fn(this.el, getPath(this, item), last(item.split('.')));
-            }, this);
+            lastPart = last(item.split('.'));
+            val = fns[item];
+            path = getPath(this, item);
+            for (fn of val) {
+                fn(el, path, lastPart);
+            }
+        }
+    },
         }
     },
 
